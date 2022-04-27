@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.*;
@@ -22,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 0;
     private BluetoothAdapter bluetoothAdapter;
     private Set<BluetoothDevice> pairedDevices;
-    //private ArrayList BTList;
+    private ListView lv;
+    private ArrayList BTList;
+    private ArrayAdapter<String> arAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
         Button btnL = findViewById(R.id.btn3);
         Button btnR = findViewById(R.id.btn4);
         TextView txt1 = findViewById(R.id.txt);
+        lv = findViewById(R.id.LV);
+        
+        // list the all of the devices paired
+        arAdapter =  new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        lv.setAdapter(arAdapter);
 
 
         // setting up bluetooth
@@ -107,12 +116,15 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.BLUETOOTH_CONNECT}, 1);
         }
 
+        arAdapter.clear();
         pairedDevices = bluetoothAdapter.getBondedDevices();
+
         if (pairedDevices.size() > 0) {
             // There are paired devices. Get the name and address of each paired device.
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
+                arAdapter.add(device.getName() + " " + device.getAddress());
             }
         }
     }
